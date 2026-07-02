@@ -1,0 +1,74 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR-USERNAME/YOUR-REPO/blob/main/Social_preference_analysis_v3.ipynb)
+
+# Zebrafish Social Preference Analysis
+
+An interactive Google Colab notebook for analysing social preference behaviour
+in zebrafish, using single-animal trajectory data exported from
+[idtracker.ai](https://idtracker.ai/).
+
+## What it does
+
+Fish are recorded in a two-phase assay: first a **baseline** phase exploring an
+empty arena, then a **test** phase after visual barriers are lifted to reveal
+conspecifics on one side. The notebook quantifies whether a fish shifts toward
+that social side once the stimulus appears, and compares this response across
+experimental groups.
+
+Given a folder of idtracker.ai sessions, the notebook will:
+
+- **Scan & register** every session, reading trajectory metadata and locating
+  each session's `background.png` and `ROI_mask.png`.
+- **Derive zones automatically** from `ROI_mask.png`, splitting the arena into
+  three vertical thirds (social / centre / far).
+- **Normalise social side** by parsing the `_L`/`_R` suffix in each filename and
+  horizontally flipping so the social third is always on the right — making
+  sessions poolable.
+- **Quantify occupancy** in the social third for the before and after phases,
+  reporting the difference and ratio, with per-phase tracking-quality checks.
+- **Summarise per group** (mean ± SEM) and **export** everything to a
+  multi-sheet Excel workbook for your own stats/plotting.
+- **Visualise**: a QC contact sheet, per-fish before/after trajectory traces,
+  a combined paired estimation plot with 95% confidence intervals, and pooled
+  group-mean occupancy heatmaps on a shared colour scale.
+
+## Input data
+
+Arrange your sessions on Google Drive with one folder per experimental group:
+
+```
+my_data/                     <- point the notebook here
+├── groupA/
+│   ├── 20250829_groupA_F1_L/
+│   │   ├── preprocessing/   (background.png, ROI_mask.png)
+│   │   └── trajectories/    (trajectories.npy)
+│   └── 20250829_groupA_F2_R/ ...
+└── groupB/
+    └── ...
+```
+
+Session folder names should follow `date_group_fish_side`, where `side` is
+`L` or `R` (the side the conspecifics appear on). The top-level folder name
+becomes the group label.
+
+> **Tip:** you only need three files per session (`trajectories.npy`,
+> `background.png`, `ROI_mask.png`). Uploading full idtracker.ai sessions
+> including the `identification_images/*.h5` files is slow and unnecessary.
+
+## How to run
+
+1. Click the "Open in Colab" badge above.
+2. Run the cells in order. Cell 1 installs dependencies; Cell 3 mounts your
+   Drive and lets you point to your data folder.
+3. Confirm the QC contact sheet looks right, set the before/after frame
+   windows, and run through to the plots and Excel export.
+
+## Requirements
+
+Runs on Google Colab with no local setup. Key libraries: `traja`, `shapely`,
+`numpy`, `pandas`, `matplotlib`, `scipy` (versions are pinned in Cell 1).
+
+## Notes
+
+This tool produces descriptive statistics and confidence intervals only — it
+does **not** run significance tests. Use the exported spreadsheet for your own
+statistical analysis.
